@@ -369,15 +369,15 @@ class StreamOutputWorker(BackendWorker):
                 img = pr.new_data
                 if img is not None:
                     if state.is_streaming:
-                        img = ImageProcessor(view_image).to_uint8().get_image('HWC')
-                        self._streamer.push_frame(img)
+                        stream_img = ImageProcessor(img).to_uint8().get_image('HWC')
+                        self._streamer.push_frame(stream_img)
 
                     if state.is_showing_window:
                         cv2.imshow(self._wnd_name, img)
 
                     if state.is_virtual_cam:
-                        view_img_uint8 = ImageProcessor(img).to_uint8().get_image('HWC')
-                        self._write_v4l2(view_img_uint8)
+                        cam_img = ImageProcessor(img).to_uint8().get_image('HWC')
+                        self._write_v4l2(cam_img)
 
         if state.is_showing_window:
             cv2.waitKey(1)
