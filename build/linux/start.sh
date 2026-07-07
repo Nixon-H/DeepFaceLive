@@ -5,7 +5,7 @@ NV_LIB=$(locate nvidia.ko |grep $(uname -r) |grep dkms | head -1)
 NV_VER=$(modinfo $NV_LIB | grep ^version |awk '{print $2}'|awk -F '.' '{print $1}')
 
 DATA_FOLDER=$(pwd)/data/
-declare CAM0 CAM1 CAM2 CAM3
+declare CAM0="" CAM1="" CAM2="" CAM3="" LOOPCAM=""
 printf "\n"
 while getopts 'cd:h' opt; do
     case "$opt" in
