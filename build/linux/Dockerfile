@@ -59,4 +59,6 @@ torchvision==0.14.1
 
 WORKDIR /app/DeepFaceLive
 COPY example.sh example.sh
+COPY patches/ patches/
+RUN set -e && cp patches/StreamOutput.py apps/DeepFaceLive/backend/StreamOutput.py && cp patches/QStreamOutput.py apps/DeepFaceLive/ui/QStreamOutput.py
 CMD ./example.sh
