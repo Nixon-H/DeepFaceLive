@@ -162,6 +162,20 @@ class StreamOutputWorker(BackendWorker):
                 pass
             self._v4l2_fd = None
 
+    def _bgr_to_yuyv(self, bgr):
+        h, w = bgr.shape[:2]
+        b = bgr[:, :, 0].astype(np.float32)
+        g = bgr[:, :, 1].astype(np.float32)
+        r = bgr[:, :, 2].astype(np.float32)
+        y = np.clip(0.299*r + 0.587*g + 0.114*b, 0, 255).astype(np.uint8)
+        u = np.clip(-0.147*r - 0.289*g + 0.436*b + 128, 0, 255).astype(np.uint8)
+        v = np.clip(0.615*r - 0.515*g - 0.100*b + 128, 0, 255).astype(np.uint8)
+        yuyv = np.zeros((h, w * 2), dtype=np.uint8)
+        yuyv[:, 0::2] = y
+        yuyv[:, 1::4] = u[:, ::2]
+        yuyv[:, 3::4] = v[:, ::2]
+        return yuyv
+
     def _write_v4l2(self, img):
         if self._v4l2_fd is None:
             return
@@ -171,8 +185,8 @@ class StreamOutputWorker(BackendWorker):
                 img = cv2.cvtColor(img, cv2.COLOR_BGRA2BGR)
             if img.dtype != np.uint8:
                 img = np.clip(img * 255, 0, 255).astype(np.uint8)
-            i420 = cv2.cvtColor(img, cv2.COLOR_BGR2YUV_I420)
-            self._v4l2_fd.write(i420.tobytes())
+            yuyv = self._bgr_to_yuyv(img)
+            self._v4l2_fd.write(yuyv.tobytes())
             self._v4l2_fd.flush()
         except OSError:
             self._close_v4l2()
