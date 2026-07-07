@@ -147,6 +147,7 @@ class StreamOutputWorker(BackendWorker):
 
     def _open_v4l2(self):
         try:
+            import fcntl, ctypes
             self._v4l2_fd = open(self._v4l2_device, 'wb', buffering=0)
             return True
         except OSError as e:
@@ -165,7 +166,13 @@ class StreamOutputWorker(BackendWorker):
         if self._v4l2_fd is None:
             return
         try:
-            self._v4l2_fd.write(img.tobytes())
+            h, w = img.shape[:2]
+            if img.shape[2] == 4:
+                img = cv2.cvtColor(img, cv2.COLOR_BGRA2BGR)
+            if img.dtype != np.uint8:
+                img = np.clip(img * 255, 0, 255).astype(np.uint8)
+            yuyv = cv2.cvtColor(img, cv2.COLOR_BGR2YUV_YUY2)
+            self._v4l2_fd.write(yuyv.tobytes())
             self._v4l2_fd.flush()
         except OSError:
             self._close_v4l2()
