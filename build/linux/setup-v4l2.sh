@@ -18,8 +18,5 @@ modprobe v4l2loopback \
   card_label="$CARD_LABEL" \
   exclusive_caps=0
 
-echo "Setting format to 640x480 RGB3..."
-v4l2-ctl -d "/dev/video${DEVICE_NR}" --set-fmt-video=width=640,height=480,pixelformat=RGB3
-v4l2-ctl -d "/dev/video${DEVICE_NR}" --set-ctrl keep_format=1
-
+echo "Format will be set by the first writer (DeepFaceLive Virtual Cam)."
 echo "Done. /dev/video${DEVICE_NR} ready for DeepFaceLive virtual camera output."
