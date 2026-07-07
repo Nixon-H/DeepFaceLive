@@ -171,8 +171,8 @@ class StreamOutputWorker(BackendWorker):
                 img = cv2.cvtColor(img, cv2.COLOR_BGRA2BGR)
             if img.dtype != np.uint8:
                 img = np.clip(img * 255, 0, 255).astype(np.uint8)
-            yuyv = cv2.cvtColor(img, cv2.COLOR_BGR2YUV_YUY2)
-            self._v4l2_fd.write(yuyv.tobytes())
+            i420 = cv2.cvtColor(img, cv2.COLOR_BGR2YUV_I420)
+            self._v4l2_fd.write(i420.tobytes())
             self._v4l2_fd.flush()
         except OSError:
             self._close_v4l2()
